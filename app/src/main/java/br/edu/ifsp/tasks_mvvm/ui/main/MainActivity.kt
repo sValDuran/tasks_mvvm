@@ -14,13 +14,15 @@ import br.edu.ifsp.tasks_mvvm.databinding.ActivityMainBinding
 import br.edu.ifsp.tasks_mvvm.R
 import br.edu.ifsp.tasks_mvvm.databinding.DialogTaskBinding
 import br.edu.ifsp.tasks_mvvm.ui.adapter.TaskAdapter
+import br.edu.ifsp.tasks_mvvm.ui.listener.TaskClickListener
+import java.text.FieldPosition
 
 
-class MainActivity : AppCompatActivity(), View.OnClickListener {
+class MainActivity : AppCompatActivity(), View.OnClickListener, TaskClickListener {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewModel: MainViewModel
-    private val adapter = TaskAdapter()
+    private val adapter = TaskAdapter(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,6 +42,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         if(view.id == R.id.button_add){
             newTask()
         }
+    }
+
+    override fun clickDone(position: Int){
+        viewModel.handleDone(position)
     }
 
     private fun setupRecyclerView(){
@@ -67,6 +73,17 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
             Toast.makeText(this, str, Toast. LENGTH_LONG).show()
         })
+
+        viewModel.updatedTask.observe(this, Observer{
+            val str = if(it){
+                "Estado da tarefa alterado com sucesso."
+            }else{
+                "ATENÇÃO! Estado da tarefa não alterado."
+            }
+
+            Toast.makeText(this, str, Toast. LENGTH_LONG).show()
+        })
+
     }
 
     private fun setupListeners() {
